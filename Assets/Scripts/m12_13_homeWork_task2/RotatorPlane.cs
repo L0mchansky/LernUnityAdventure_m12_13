@@ -19,7 +19,7 @@ public class RotatorPlane : MonoBehaviour
     private void Start()
     {
         _sphereTransform.position = _startPosition;
-        _sphereTransform.gameObject.SetActive(true);
+        _sphereTransform.GetComponent<Rigidbody>().WakeUp();
     }
 
     void Update()
