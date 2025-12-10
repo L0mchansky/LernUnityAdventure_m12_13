@@ -10,12 +10,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _rotationForce;
     [SerializeField] private float _jumpForce;
 
+    [SerializeField] private RotatorRigidbody _rotaterRigidbody;
+
     private bool _isJump;
+    private bool _isOnGround;
 
     private float _xInput;
     private float _zInput;
-
-    private float _deadZone = 0.05f;
 
     private void Start()
     {
@@ -27,7 +28,7 @@ public class PlayerController : MonoBehaviour
         _xInput = Input.GetAxis(HorizontalAxis);
         _zInput = Input.GetAxis(VerticalAxis);
 
-        if (Input.GetKeyDown(JumpKey))
+        if (Input.GetKeyDown(JumpKey) && _isOnGround)
         {
             _isJump = true;
         }
@@ -35,27 +36,31 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        float koefForce;
-
-        if (Mathf.Abs(_xInput) > _deadZone && Mathf.Abs(_zInput) > _deadZone)
+        if (_isOnGround)
         {
-            koefForce = 0.5f;
+            _rotaterRigidbody.RotateProcess(_xInput, _zInput, _rigidBody, _rotationForce);
         }
-        else
-        {
-            koefForce = 1f;
-        }
-
-        if (Mathf.Abs(_xInput) > _deadZone)
-            _rigidBody.AddTorque(Vector3.back * _rotationForce * _xInput * koefForce);
-
-        if (Mathf.Abs(_zInput) > _deadZone)
-            _rigidBody.AddTorque(Vector3.right * _rotationForce * _zInput * koefForce);
 
         if (_isJump)
         {
             _rigidBody.AddForce(Vector3.up * _jumpForce);
             _isJump = false;
+        }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.TryGetComponent<Ground>(out var groundComponent))
+        {
+            _isOnGround = true;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.TryGetComponent<Ground>(out var groundComponent))
+        {
+            _isOnGround = false;
         }
     }
 }
