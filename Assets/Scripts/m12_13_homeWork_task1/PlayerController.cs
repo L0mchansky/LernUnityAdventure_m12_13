@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
     private float _xInput;
     private float _zInput;
 
+    public void SetOnGround(bool isOnGround) => _isOnGround = isOnGround;
+
     private void Start()
     {
         _rigidBody.maxAngularVelocity = _rotationForce;
@@ -45,22 +47,6 @@ public class PlayerController : MonoBehaviour
         {
             _rigidBody.AddForce(Vector3.up * _jumpForce);
             _isJump = false;
-        }
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        if (collision.gameObject.TryGetComponent<Ground>(out var groundComponent))
-        {
-            _isOnGround = true;
-        }
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.TryGetComponent<Ground>(out var groundComponent))
-        {
-            _isOnGround = false;
         }
     }
 }

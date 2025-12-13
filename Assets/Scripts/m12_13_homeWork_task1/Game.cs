@@ -4,6 +4,7 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
     [SerializeField] private GameObject _player;
+    [SerializeField] private Wallet _playerWallet;
     [SerializeField] private float _timeToLose;
     [SerializeField] private float _requiredScoreToWin;
     [SerializeField] private GameTimer _gameTimer;
@@ -29,6 +30,9 @@ public class Game : MonoBehaviour
 
         if (_gameIsProgress)
         {
+            if (CheckWin(_playerWallet.Amount))
+                return;
+
             _gameTimer.UpdateTimer(_timeToLose);
 
             if (_gameTimer.IsTimerActive == false)
@@ -45,14 +49,12 @@ public class Game : MonoBehaviour
             coin.gameObject.SetActive(true);
         }
 
-        if (_player.TryGetComponent<Wallet>(out Wallet playerWallet))
-        {
-            playerWallet.ResetMoney();
-        }
+        _playerWallet.ResetMoney();
 
         _player.SetActive(true);
         _player.transform.position = Vector3.zero;
         _player.transform.rotation = Quaternion.Euler(Vector3.zero);
+
         _gameIsProgress = true;
         _gameTimer.Reset();
     }
@@ -65,11 +67,14 @@ public class Game : MonoBehaviour
         Debug.Log(endGameMode ? _msgToWin : _msgToLose);
     }
 
-    public void CheckWin(float value)
+    public bool CheckWin(float value)
     {
         if (value >= _requiredScoreToWin)
         {
             StopGame(true);
+            return true;
         }
+
+        return false;
     }
 }

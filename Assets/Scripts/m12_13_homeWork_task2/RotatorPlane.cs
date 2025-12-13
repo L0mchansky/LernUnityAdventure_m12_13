@@ -1,48 +1,44 @@
 using UnityEngine;
 
-public class RotatorPlane : MonoBehaviour
+namespace m12_13_homeWork_task2
 {
-    private string HorizontalAxis = "Horizontal";
-    private string VerticalAxis = "Vertical";
-
-    [SerializeField] private int _sensetive;
-    [SerializeField] private Vector3 _startPosition;
-    [SerializeField] private Transform _sphereTransform;
-
-    private float _xInput;
-    private float _zInput;
-
-    private bool _isRotate;
-
-    private float _deadZone = 0.05f;
-
-    private void Start()
+    public class RotatorPlane : MonoBehaviour
     {
-        _sphereTransform.position = _startPosition;
-        _sphereTransform.GetComponent<Rigidbody>().WakeUp();
-    }
+        private string HorizontalAxis = "Horizontal";
+        private string VerticalAxis = "Vertical";
 
-    void Update()
-    {
-        _xInput = Input.GetAxis(HorizontalAxis);
-        _zInput = Input.GetAxis(VerticalAxis);
+        [SerializeField] private int _sensetive;
+        [SerializeField] private Rigidbody _rigidbody;
 
-        if (Mathf.Abs(_xInput) > _deadZone)
-            _isRotate = true;
+        private float _xInput;
+        private float _zInput;
 
-        if (Mathf.Abs(_zInput) > _deadZone)
-            _isRotate = true;
-    }
+        private bool _isRotate;
 
-    private void FixedUpdate()
-    {
+        private float _deadZone = 0.05f;
 
-        Vector3 rotation = new Vector3(_zInput, 0, -_xInput) * _sensetive * Time.deltaTime;
-
-        if (_isRotate)
+        void Update()
         {
-            transform.Rotate(rotation);
-            _isRotate = false;
+            _xInput = Input.GetAxis(HorizontalAxis);
+            _zInput = Input.GetAxis(VerticalAxis);
+
+            if (Mathf.Abs(_xInput) > _deadZone)
+                _isRotate = true;
+
+            if (Mathf.Abs(_zInput) > _deadZone)
+                _isRotate = true;
+        }
+
+        private void FixedUpdate()
+        {
+            Vector3 rotation = new Vector3(_zInput, 0, -_xInput) * _sensetive * Time.deltaTime;
+            Quaternion quaternion = Quaternion.Euler(rotation);
+
+            if (_isRotate)
+            {
+                _rigidbody.MoveRotation(_rigidbody.rotation * quaternion);
+                _isRotate = false;
+            }
         }
     }
 }
